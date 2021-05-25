@@ -9,7 +9,7 @@ namespace HEF.XTask.RocketMQ
         RocketDelay CreateRocketDelay(int delaySeconds);
     }
 
-    public class RocketDelayProvider
+    public class RocketDelayProvider : IRocketDelayProvider
     {
         private readonly SortedList<int, int> _rocketDelayTimeLevels = new SortedList<int, int>();
 
@@ -56,6 +56,9 @@ namespace HEF.XTask.RocketMQ
 
         public RocketDelay CreateRocketDelay(int delaySeconds)
         {
+            if (delaySeconds < 1)
+                return new RocketDelay();
+
             var (currentDelaySeconds, currentDelayLevel) = GetDelayTimeWithLevel(delaySeconds);
 
             if (currentDelayLevel == 0)  //延迟时间小于 所有预定义的延迟时间，发送即时消息
