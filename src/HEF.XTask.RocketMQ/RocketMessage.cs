@@ -13,7 +13,7 @@
         /// <summary>
         /// 延迟信息
         /// </summary>
-        public RocketDelay Delay { get; set; }
+        public RocketDelay Delay { get; set; } = new RocketDelay();
     }
 
     public class RocketDelay
