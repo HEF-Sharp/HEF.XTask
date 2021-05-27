@@ -66,8 +66,8 @@ namespace HEF.XTask.RocketMQ
 
             return new RocketDelay
             {
-                RemainDelaySeconds = delaySeconds - currentDelaySeconds,
-                DelayTimeLevel = currentDelayLevel
+                DelayTimeLevel = currentDelayLevel,
+                RemainDelaySeconds = delaySeconds - currentDelaySeconds
             };
         }
 

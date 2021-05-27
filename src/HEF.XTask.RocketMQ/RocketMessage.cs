@@ -13,7 +13,12 @@
         /// <summary>
         /// 延迟信息
         /// </summary>
-        public RocketDelay Delay { get; set; } = new RocketDelay();
+        public RocketDelay Delay { get; set; }
+
+        /// <summary>
+        /// 分发信息
+        /// </summary>
+        public RocketDispatch Dispatch { get; set; }
     }
 
     public class RocketDelay
@@ -27,5 +32,15 @@
         /// 剩余延迟秒数
         /// </summary>
         public int RemainDelaySeconds { get; set; }
+    }
+
+    /// <summary>
+    /// Rocket分发
+    /// </summary>
+    public class RocketDispatch
+    {
+        public string Topic { get; set; }
+
+        public string Tag { get; set; }
     }
 }

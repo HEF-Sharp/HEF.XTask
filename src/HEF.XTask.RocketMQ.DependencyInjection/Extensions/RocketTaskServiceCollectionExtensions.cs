@@ -12,9 +12,7 @@ namespace HEF.XTask.RocketMQ
                 throw new ArgumentNullException(nameof(delayProviderFactory));
 
             collection.AddSingleton(delayProviderFactory);
-            collection.AddSingleton<IRocketTaskFactory, RocketTaskFactory>();
-
-            collection.AddSingleton<IRocketTaskExecutor, RocketTaskExecutor>();
+            collection.AddSingleton<IRocketTaskScheduler, RocketTaskScheduler>();
 
             return collection;
         }
