@@ -28,9 +28,9 @@ namespace HEF.XTask.RocketMQ
                 return Task.FromResult(isPublished);
             }
 
-            return Consume(typedMessage.Message, rocketMessage.Body);
+            return Consume(typedMessage.Message, rocketMessage);
         }
 
-        protected abstract Task<bool> Consume(MessageExt messageExt, TMessageBody messageBody);
+        protected abstract Task<bool> Consume(MessageExt messageExt, RocketMessage<TMessageBody> rocketMessage);
     }
 }

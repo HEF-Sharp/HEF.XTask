@@ -7,6 +7,10 @@ namespace HEF.XTask.RocketMQ
     public interface IRocketDelayProvider
     {
         RocketDelay CreateRocketDelay(int delaySeconds);
+
+        RocketDelay GetMinRocketDelay();
+
+        RocketDelay GetNextRocketDelay(int delayLevel);
     }
 
     public class RocketDelayProvider : IRocketDelayProvider
@@ -69,6 +73,26 @@ namespace HEF.XTask.RocketMQ
                 DelayTimeLevel = currentDelayLevel,
                 RemainDelaySeconds = delaySeconds - currentDelaySeconds
             };
+        }
+
+        public RocketDelay GetMinRocketDelay()
+        {
+            return new RocketDelay { DelayTimeLevel = _rocketDelayTimeLevels.Values[0] };
+        }
+
+        public RocketDelay GetNextRocketDelay(int delayLevel)
+        {
+            if (!_rocketDelayTimeLevels.ContainsValue(delayLevel))
+                throw new InvalidOperationException("target message delay level is undefined");
+
+            var currentIndex = _rocketDelayTimeLevels.IndexOfValue(delayLevel);
+            var nextIndex = currentIndex + 1;
+            if (nextIndex == _rocketDelayTimeLevels.Count)   //已经是最大的延迟时间
+            {
+                return new RocketDelay { DelayTimeLevel = delayLevel };
+            }
+
+            return new RocketDelay { DelayTimeLevel = _rocketDelayTimeLevels.Values[nextIndex] };
         }
 
         #region Helper Functions
