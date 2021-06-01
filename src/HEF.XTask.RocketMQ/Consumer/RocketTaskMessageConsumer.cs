@@ -21,10 +21,9 @@ namespace HEF.XTask.RocketMQ
             if (rocketMessage.Delay.RemainDelaySeconds > 0)
             {
                 //还没到延迟时间 通过剩余延迟秒数 发布新的延迟任务
-                var newRocketTask = new XRocketTask<TMessageBody>(rocketMessage.Body,
-                    rocketMessage.Dispatch.Topic, rocketMessage.Dispatch.Tag, rocketMessage.Delay.RemainDelaySeconds);
+                var nextDelayTask = new XRocketTask<TMessageBody>(rocketMessage, rocketMessage.Delay.RemainDelaySeconds);
 
-                var isPublished = RocketTaskScheduler.Schedule(newRocketTask);
+                var isPublished = RocketTaskScheduler.Schedule(nextDelayTask);
                 return Task.FromResult(isPublished);
             }
 

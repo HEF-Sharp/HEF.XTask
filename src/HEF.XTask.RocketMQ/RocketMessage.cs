@@ -19,6 +19,11 @@
         /// 分发信息
         /// </summary>
         public RocketDispatch Dispatch { get; set; }
+
+        /// <summary>
+        /// 重试次数
+        /// </summary>
+        public int RetryCount { get; set; } = 0;
     }
 
     public class RocketDelay

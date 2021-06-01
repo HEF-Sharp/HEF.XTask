@@ -20,6 +20,14 @@ namespace HEF.XTask.RocketMQ
             : base(null, BuildRocketMessage(messageBody, topic, tag), delaySeconds)
         { }
 
+        public XRocketTask(RocketMessage<TMessageBody> rocketMessage)
+            : this(rocketMessage, 0)
+        { }
+
+        public XRocketTask(RocketMessage<TMessageBody> rocketMessage, int delaySeconds)
+            : base(null, ValidateRocketMessage(rocketMessage), delaySeconds)
+        { }
+
         private static RocketMessage<TMessageBody> BuildRocketMessage(TMessageBody messageBody,
             string topic, string tag)
         {
@@ -35,5 +43,19 @@ namespace HEF.XTask.RocketMQ
                 Dispatch = new RocketDispatch { Topic = topic, Tag = tag }
             };
         }
-    }
+
+        private static RocketMessage<TMessageBody> ValidateRocketMessage(RocketMessage<TMessageBody> rocketMessage)
+        {
+            if (rocketMessage == null)
+                throw new ArgumentNullException(nameof(rocketMessage));
+
+            if (rocketMessage.Body == null)
+                throw new ArgumentNullException($"message{nameof(rocketMessage.Body)}");
+
+            if (string.IsNullOrWhiteSpace(rocketMessage.Dispatch?.Topic))
+                throw new ArgumentNullException(nameof(rocketMessage.Dispatch.Topic));
+
+            return rocketMessage;
+        }
+     }
 }
