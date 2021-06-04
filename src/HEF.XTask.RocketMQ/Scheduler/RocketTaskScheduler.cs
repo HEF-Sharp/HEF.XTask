@@ -29,7 +29,7 @@ namespace HEF.XTask.RocketMQ
             if (rocketTask == null)
                 throw new ArgumentNullException(nameof(rocketTask));
 
-            var rocketMessage = rocketTask.Params;
+            var rocketMessage = rocketTask.InnerTask.Params;
 
             //构造Delay信息
             rocketMessage.Delay = DelayProvider.CreateRocketDelay(rocketTask.DelaySeconds);
@@ -42,11 +42,22 @@ namespace HEF.XTask.RocketMQ
             if (rocketTask == null)
                 throw new ArgumentNullException(nameof(rocketTask));
 
-            var rocketMessage = rocketTask.Params;
+            var rocketMessage = rocketTask.InnerTask.Params;
 
-            rocketMessage.Delay = GetRetryRocketDelay(rocketMessage);
-            rocketMessage.RetryCount++;
+            if (rocketMessage.Retry.IsRetryEnd())
+                return false;  //已达最大重试次数，结束重试
 
+            if (rocketMessage.Retry.IsRetrying)
+            {
+                rocketMessage.Delay = GetNextRocketDelay(rocketMessage);
+                return PublishRocketMessage(rocketMessage);
+            }
+
+            if (!rocketMessage.Retry.StartRetry())
+                return false;   //启动重试失败(最大重试次数小于1)，不需要重试
+
+            //发布首次重试任务
+            rocketMessage.Delay = DelayProvider.GetMinRocketDelay();
             return PublishRocketMessage(rocketMessage);
         }
 
@@ -61,11 +72,8 @@ namespace HEF.XTask.RocketMQ
             return result.Status == SendStatus.SendOK;
         }
 
-        private RocketDelay GetRetryRocketDelay<TMessageBody>(RocketMessage<TMessageBody> rocketMessage)
+        private RocketDelay GetNextRocketDelay<TMessageBody>(RocketMessage<TMessageBody> rocketMessage)
         {
-            if (rocketMessage.RetryCount == 0)
-                return DelayProvider.GetMinRocketDelay();
-
             return DelayProvider.GetNextRocketDelay(rocketMessage.Delay.DelayTimeLevel);
         }
         #endregion

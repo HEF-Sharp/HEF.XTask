@@ -21,9 +21,9 @@
         public RocketDispatch Dispatch { get; set; }
 
         /// <summary>
-        /// 重试次数
+        /// 重试信息
         /// </summary>
-        public int RetryCount { get; set; } = 0;
+        public XRetryStatus Retry { get; set; }
     }
 
     public class RocketDelay

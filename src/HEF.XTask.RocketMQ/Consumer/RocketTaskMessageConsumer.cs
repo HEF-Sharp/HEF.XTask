@@ -14,7 +14,7 @@ namespace HEF.XTask.RocketMQ
 
         protected IRocketTaskScheduler RocketTaskScheduler { get; }
 
-        public Task<bool> Consume(MQTypedMessage<MessageExt, RocketMessage<TMessageBody>> typedMessage)
+        public async Task<bool> Consume(MQTypedMessage<MessageExt, RocketMessage<TMessageBody>> typedMessage)
         {
             var rocketMessage = typedMessage.Content;
 
@@ -22,12 +22,22 @@ namespace HEF.XTask.RocketMQ
             {
                 //还没到延迟时间 通过剩余延迟秒数 发布新的延迟任务
                 var nextDelayTask = new XRocketTask<TMessageBody>(rocketMessage, rocketMessage.Delay.RemainDelaySeconds);
-
-                var isPublished = RocketTaskScheduler.Schedule(nextDelayTask);
-                return Task.FromResult(isPublished);
+                return RocketTaskScheduler.Schedule(nextDelayTask);
             }
 
-            return Consume(typedMessage.Message, rocketMessage);
+            var result = await Consume(typedMessage.Message, rocketMessage);
+            if (rocketMessage.Retry.IsRetrying)
+            {
+                rocketMessage.Retry.RetryOnce(); //累加重试次数
+            }
+
+            if (!result)  //延迟任务执行失败，进行重试
+            {
+                var retryTask = new XRocketTask<TMessageBody>(rocketMessage);
+                RocketTaskScheduler.Retry(retryTask);
+            }
+
+            return true;
         }
 
         protected abstract Task<bool> Consume(MessageExt messageExt, RocketMessage<TMessageBody> rocketMessage);
