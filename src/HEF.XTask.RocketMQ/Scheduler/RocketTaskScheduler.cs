@@ -9,6 +9,8 @@ namespace HEF.XTask.RocketMQ
         bool Schedule<TMessageBody>(XRocketTask<TMessageBody> rocketTask);
 
         bool Retry<TMessageBody>(XRocketTask<TMessageBody> rocketTask);
+
+        bool Timing<TMessageBody>(XRocketTask<TMessageBody> rocketTask);
     }
 
     public class RocketTaskScheduler : IRocketTaskScheduler
@@ -59,6 +61,16 @@ namespace HEF.XTask.RocketMQ
             //发布首次重试任务
             rocketMessage.Delay = DelayProvider.GetMinRocketDelay();
             return PublishRocketMessage(rocketMessage);
+        }
+
+        public bool Timing<TMessageBody>(XRocketTask<TMessageBody> rocketTask)
+        {
+            if (rocketTask == null)
+                throw new ArgumentNullException(nameof(rocketTask));
+
+            var rocketMessage = rocketTask.InnerTask.Params;
+
+            throw new NotImplementedException();
         }
 
         #region Helper Functions

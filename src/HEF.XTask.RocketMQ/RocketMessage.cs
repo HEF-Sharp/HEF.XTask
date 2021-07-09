@@ -11,19 +11,9 @@
         public TMessageBody Body { get; set; }
 
         /// <summary>
-        /// 延迟信息
-        /// </summary>
-        public RocketDelay Delay { get; set; }
-
-        /// <summary>
         /// 分发信息
         /// </summary>
         public RocketDispatch Dispatch { get; set; }
-
-        /// <summary>
-        /// 重试信息
-        /// </summary>
-        public XRetryStatus Retry { get; set; }
     }
 
     public class RocketDelay
