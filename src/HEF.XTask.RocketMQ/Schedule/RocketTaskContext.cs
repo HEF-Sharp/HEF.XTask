@@ -23,13 +23,6 @@
 
             return ScheduleContext.ScheduleOptions.DelaySeconds;
         }
-
-        public RocketTaskContext ResetRocketDelay()
-        {
-            DelayStatus = new RocketDelayStatus();
-
-            return this;
-        }
         #endregion
     }
 
