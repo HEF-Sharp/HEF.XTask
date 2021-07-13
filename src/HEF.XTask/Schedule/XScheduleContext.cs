@@ -1,28 +1,29 @@
 ﻿namespace HEF.XTask
 {
+    /// <summary>
+    /// 调度Context
+    /// </summary>
     public class XScheduleContext
     {
+        /// <summary>
+        /// 调度配置
+        /// </summary>
         public XScheduleOptions ScheduleOptions { get; set; }
 
+        /// <summary>
+        /// 重试状态
+        /// </summary>
         public XRetryStatus RetryStatus { get; set; } = new XRetryStatus();
 
-        #region DelayMethods
-        public int GetDelaySeconds()
-        {
-            return ScheduleOptions.Type switch
-            {
-                XScheduleType.Delay => ScheduleOptions.DelaySeconds,
-                XScheduleType.Timing => ScheduleOptions.IntervalSeconds,
-                _ => 0
-            };
-        }
+        #region TimingMethods
+        public bool IsTiming() => ScheduleOptions.Type == XScheduleType.Timing;
         #endregion
 
         #region RetryMethods
-        public bool StartRetry()
+        public bool CheckStartRetry()
         {
             if (RetryStatus.IsRetrying)
-                return false;
+                return true;
 
             if (ScheduleOptions.MaxRetryCount < 1)
                 return false;
@@ -32,6 +33,8 @@
 
             return true;
         }
+
+        public bool IsRetrying() => RetryStatus.IsRetrying;
 
         public bool IsRetryEnd()
         {

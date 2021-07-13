@@ -14,19 +14,11 @@
         /// 分发信息
         /// </summary>
         public RocketDispatch Dispatch { get; set; }
-    }
-
-    public class RocketDelay
-    {
-        /// <summary>
-        /// 延迟时间等级
-        /// </summary>
-        public int DelayTimeLevel { get; set; }
 
         /// <summary>
-        /// 剩余延迟秒数
+        /// Context
         /// </summary>
-        public int RemainDelaySeconds { get; set; }
+        public RocketTaskContext Context { get; set; }
     }
 
     /// <summary>

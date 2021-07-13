@@ -6,11 +6,11 @@ namespace HEF.XTask.RocketMQ
 {
     public interface IRocketDelayProvider
     {
-        RocketDelay CreateRocketDelay(int delaySeconds);
+        RocketDelayStatus CreateRocketDelay(int delaySeconds);
 
-        RocketDelay GetMinRocketDelay();
+        RocketDelayStatus GetMinRocketDelay();
 
-        RocketDelay GetNextRocketDelay(int delayLevel);
+        RocketDelayStatus GetNextRocketDelay(int delayLevel);
     }
 
     public class RocketDelayProvider : IRocketDelayProvider
@@ -58,29 +58,29 @@ namespace HEF.XTask.RocketMQ
 
         #endregion
 
-        public RocketDelay CreateRocketDelay(int delaySeconds)
+        public RocketDelayStatus CreateRocketDelay(int delaySeconds)
         {
             if (delaySeconds < 1)
-                return new RocketDelay();
+                return new RocketDelayStatus();
 
             var (currentDelaySeconds, currentDelayLevel) = GetDelayTimeWithLevel(delaySeconds);
 
             if (currentDelayLevel == 0)  //延迟时间小于 所有预定义的延迟时间，发送即时消息
-                return new RocketDelay();
+                return new RocketDelayStatus();
 
-            return new RocketDelay
+            return new RocketDelayStatus
             {
                 DelayTimeLevel = currentDelayLevel,
                 RemainDelaySeconds = delaySeconds - currentDelaySeconds
             };
         }
 
-        public RocketDelay GetMinRocketDelay()
+        public RocketDelayStatus GetMinRocketDelay()
         {
-            return new RocketDelay { DelayTimeLevel = _rocketDelayTimeLevels.Values[0] };
+            return new RocketDelayStatus { DelayTimeLevel = _rocketDelayTimeLevels.Values[0] };
         }
 
-        public RocketDelay GetNextRocketDelay(int delayLevel)
+        public RocketDelayStatus GetNextRocketDelay(int delayLevel)
         {
             if (!_rocketDelayTimeLevels.ContainsValue(delayLevel))
                 throw new InvalidOperationException("target message delay level is undefined");
@@ -89,10 +89,10 @@ namespace HEF.XTask.RocketMQ
             var nextIndex = currentIndex + 1;
             if (nextIndex == _rocketDelayTimeLevels.Count)   //已经是最大的延迟时间
             {
-                return new RocketDelay { DelayTimeLevel = delayLevel };
+                return new RocketDelayStatus { DelayTimeLevel = delayLevel };
             }
 
-            return new RocketDelay { DelayTimeLevel = _rocketDelayTimeLevels.Values[nextIndex] };
+            return new RocketDelayStatus { DelayTimeLevel = _rocketDelayTimeLevels.Values[nextIndex] };
         }
 
         #region Helper Functions

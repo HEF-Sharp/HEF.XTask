@@ -18,23 +18,34 @@ namespace HEF.XTask.RocketMQ
         {
             var rocketMessage = typedMessage.Content;
 
-            if (rocketMessage.Delay.RemainDelaySeconds > 0)
+            if (rocketMessage.Context.DelayStatus.RemainDelaySeconds > 0)
             {
                 //还没到延迟时间 通过剩余延迟秒数 发布新的延迟任务
-                var nextDelayTask = new XRocketTask<TMessageBody>(rocketMessage, rocketMessage.Delay.RemainDelaySeconds);
-                return RocketTaskScheduler.Schedule(nextDelayTask);
+                var nextDelayTask = new XRocketTask<TMessageBody>(rocketMessage);
+                return RocketTaskScheduler.Schedule(nextDelayTask, rocketMessage.Context);
             }
 
             var result = await Consume(typedMessage.Message, rocketMessage);
-            if (rocketMessage.Retry.IsRetrying)
+
+            var scheduleContext = rocketMessage.Context.ScheduleContext;
+
+            if (scheduleContext.IsTiming())  //定时调度 直接发布下一次执行任务
             {
-                rocketMessage.Retry.RetryOnce(); //累加重试次数
+                var nextIntervalTask = new XRocketTask<TMessageBody>(rocketMessage);
+                RocketTaskScheduler.Schedule(nextIntervalTask, rocketMessage.Context.ResetRocketDelay());
+
+                return true;
             }
+
+            scheduleContext.RetryOnce(); //累加重试次数
 
             if (!result)  //延迟任务执行失败，进行重试
             {
-                var retryTask = new XRocketTask<TMessageBody>(rocketMessage);
-                RocketTaskScheduler.Retry(retryTask);
+                if (scheduleContext.CheckStartRetry())
+                {
+                    var retryTask = new XRocketTask<TMessageBody>(rocketMessage);
+                    RocketTaskScheduler.Schedule(retryTask, rocketMessage.Context);
+                }
             }
 
             return true;
