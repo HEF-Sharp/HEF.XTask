@@ -17,7 +17,11 @@
         /// <summary>
         /// 重试执行
         /// </summary>
-        Retry
+        Retry,
+        /// <summary>
+        /// 延迟定时执行
+        /// </summary>
+        DelayTiming
     }
 
     /// <summary>

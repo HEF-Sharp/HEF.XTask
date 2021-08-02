@@ -29,7 +29,7 @@ namespace HEF.XTask.RocketMQ
 
             var scheduleContext = rocketMessage.Context.ScheduleContext;
 
-            if (scheduleContext.IsTiming())  //定时调度 直接发布下一次执行任务
+            if (scheduleContext.CheckStartTiming())  //定时调度 直接发布下一次执行任务
             {
                 var nextIntervalTask = new XRocketTask<TMessageBody>(rocketMessage);
                 RocketTaskScheduler.Schedule(nextIntervalTask, rocketMessage.Context);

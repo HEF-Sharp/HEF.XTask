@@ -33,6 +33,9 @@ namespace HEF.XTask.RocketMQ
             if (rocketTaskContext.DelayStatus.RemainDelaySeconds > 0)
                 return ScheduleDelay(rocketTask, rocketTaskContext);
 
+            if (rocketTaskContext.ScheduleContext.IsTiming())
+                return ScheduleTiming(rocketTask, rocketTaskContext);
+
             if (rocketTaskContext.ScheduleContext.IsRetrying())
                 return ScheduleRetry(rocketTask, rocketTaskContext);
 
@@ -42,6 +45,7 @@ namespace HEF.XTask.RocketMQ
                 RocketTaskContext { ScheduleContext: { ScheduleOptions: { Type: XScheduleType.Delay } } } => ScheduleDelay(rocketTask, rocketTaskContext),
                 RocketTaskContext { ScheduleContext: { ScheduleOptions: { Type: XScheduleType.Timing } } } => ScheduleTiming(rocketTask, rocketTaskContext),
                 RocketTaskContext { ScheduleContext: { ScheduleOptions: { Type: XScheduleType.Retry } } } => ScheduleRetry(rocketTask, rocketTaskContext),
+                RocketTaskContext { ScheduleContext: { ScheduleOptions: { Type: XScheduleType.DelayTiming } } } => ScheduleDelay(rocketTask, rocketTaskContext),
                 _ => throw new NotSupportedException("not supported task schedule")
             };
         }
@@ -65,7 +69,12 @@ namespace HEF.XTask.RocketMQ
 
         protected bool ScheduleTiming<TMessageBody>(XRocketTask<TMessageBody> rocketTask, RocketTaskContext rocketTaskContext)
         {
-            var intervalSeconds = rocketTaskContext.ScheduleContext.ScheduleOptions.IntervalSeconds;
+            var scheduleContext = rocketTaskContext.ScheduleContext;
+
+            if (!scheduleContext.CheckStartTiming())
+                return false;   //启动定时失败
+
+            var intervalSeconds = scheduleContext.ScheduleOptions.IntervalSeconds;
             rocketTaskContext.DelayStatus = DelayProvider.CreateRocketDelay(intervalSeconds);
 
             rocketTask.Params.Context = rocketTaskContext;

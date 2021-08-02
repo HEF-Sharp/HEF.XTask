@@ -15,8 +15,32 @@
         /// </summary>
         public XRetryStatus RetryStatus { get; set; } = new XRetryStatus();
 
+        /// <summary>
+        /// 定时状态
+        /// </summary>
+        public XTimingStatus TimingStatus { get; set; } = new XTimingStatus();
+
         #region TimingMethods
-        public bool IsTiming() => ScheduleOptions.Type == XScheduleType.Timing;
+        public bool IsTimingSchedule()
+        {
+            return ScheduleOptions.Type == XScheduleType.Timing
+                || ScheduleOptions.Type == XScheduleType.DelayTiming;
+        }
+
+        public bool CheckStartTiming()
+        {
+            if (TimingStatus.IsTiming)
+                return true;
+
+            if (!IsTimingSchedule())
+                return false;
+
+            TimingStatus.IsTiming = true;
+
+            return true;
+        }
+
+        public bool IsTiming() => TimingStatus.IsTiming;
         #endregion
 
         #region RetryMethods
@@ -64,5 +88,13 @@
         /// 是否正在重试
         /// </summary>
         public bool IsRetrying { get; set; }
+    }
+
+    public class XTimingStatus
+    {
+        /// <summary>
+        /// 是否正在定时
+        /// </summary>
+        public bool IsTiming { get; set; }
     }
 }
