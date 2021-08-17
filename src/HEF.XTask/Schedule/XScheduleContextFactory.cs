@@ -28,13 +28,20 @@ namespace HEF.XTask
             return scheduleOptions.BuildScheduleContext();
         }
 
-        public static XScheduleContext Timing(TimeSpan interval)
+        public static XScheduleContext Timing(TimeSpan interval, TimeSpan timeout = default)
         {
             var intervalSeconds = Convert.ToInt32(Math.Floor(interval.TotalSeconds));
             if (intervalSeconds < 1)
                 throw new ArgumentOutOfRangeException(nameof(interval), "timing interval seconds should greater than zero");
 
-            var scheduleOptions = new XScheduleOptions { Type = XScheduleType.Timing, IntervalSeconds = intervalSeconds };
+            var timeoutSeconds = Convert.ToInt32(Math.Floor(timeout.TotalSeconds));
+            if (timeoutSeconds < 0)
+                throw new ArgumentOutOfRangeException(nameof(timeout), "timing timeout seconds should not less than zero");
+
+            if (timeoutSeconds > 0 && timeoutSeconds < intervalSeconds)
+                throw new ArgumentOutOfRangeException(nameof(timeout), "timing timeout seconds should not less than interval seconds");
+
+            var scheduleOptions = new XScheduleOptions { Type = XScheduleType.Timing, IntervalSeconds = intervalSeconds, TimeoutSeconds = timeoutSeconds };
 
             return scheduleOptions.BuildScheduleContext();
         }
@@ -49,7 +56,7 @@ namespace HEF.XTask
             return scheduleOptions.BuildScheduleContext();
         }
 
-        public static XScheduleContext DelayTiming(TimeSpan delay, TimeSpan interval)
+        public static XScheduleContext DelayTiming(TimeSpan delay, TimeSpan interval, TimeSpan timeout = default)
         {
             var delaySeconds = Convert.ToInt32(Math.Floor(delay.TotalSeconds));
             if (delaySeconds < 1)
@@ -59,7 +66,20 @@ namespace HEF.XTask
             if (intervalSeconds < 1)
                 throw new ArgumentOutOfRangeException(nameof(interval), "timing interval seconds should greater than zero");
 
-            var scheduleOptions = new XScheduleOptions { Type = XScheduleType.DelayTiming, DelaySeconds = delaySeconds, IntervalSeconds = intervalSeconds };
+            var timeoutSeconds = Convert.ToInt32(Math.Floor(timeout.TotalSeconds));
+            if (timeoutSeconds < 0)
+                throw new ArgumentOutOfRangeException(nameof(timeout), "timing timeout seconds should not less than zero");
+
+            if (timeoutSeconds > 0 && timeoutSeconds < intervalSeconds)
+                throw new ArgumentOutOfRangeException(nameof(timeout), "timing timeout seconds should not less than interval seconds");
+
+            var scheduleOptions = new XScheduleOptions
+            {
+                Type = XScheduleType.DelayTiming,
+                DelaySeconds = delaySeconds,
+                IntervalSeconds = intervalSeconds,
+                TimeoutSeconds = timeoutSeconds
+            };
 
             return scheduleOptions.BuildScheduleContext();
         }

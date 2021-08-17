@@ -36,11 +36,27 @@
                 return false;
 
             TimingStatus.IsTiming = true;
+            TimingStatus.TimedCount = 0;
 
             return true;
         }
 
         public bool IsTiming() => TimingStatus.IsTiming;
+
+        public bool IsTimingTimeout()
+        {
+            return TimingStatus.IsTiming
+                && ScheduleOptions.TimeoutSeconds > 0
+                && (TimingStatus.TimedCount + 1) * ScheduleOptions.IntervalSeconds > ScheduleOptions.TimeoutSeconds;
+        }
+
+        public void TimingOnce()
+        {
+            if (IsTiming() && !IsTimingTimeout())
+            {
+                TimingStatus.TimedCount++;
+            }
+        }
         #endregion
 
         #region RetryMethods
@@ -68,8 +84,7 @@
 
         public void RetryOnce()
         {
-            if (RetryStatus.IsRetrying
-                && RetryStatus.RetriedCount < ScheduleOptions.MaxRetryCount)
+            if (IsRetrying() && !IsRetryEnd())
             {
                 RetryStatus.RetriedCount++;
             }
@@ -92,6 +107,11 @@
 
     public class XTimingStatus
     {
+        /// <summary>
+        /// 已定时执行次数
+        /// </summary>
+        public long TimedCount { get; set; }
+
         /// <summary>
         /// 是否正在定时
         /// </summary>

@@ -71,6 +71,9 @@ namespace HEF.XTask.RocketMQ
         {
             var scheduleContext = rocketTaskContext.ScheduleContext;
 
+            if (scheduleContext.IsTimingTimeout())
+                return false;  //下一次interval超过timeout时间，结束定时
+
             if (!scheduleContext.CheckStartTiming())
                 return false;   //启动定时失败
 

@@ -45,6 +45,11 @@
         public int IntervalSeconds { get; set; }
 
         /// <summary>
+        /// 超时秒数（超过该时间结束定时任务）
+        /// </summary>
+        public int TimeoutSeconds { get; set; }
+
+        /// <summary>
         /// 最大重试次数
         /// </summary>
         public int MaxRetryCount { get; set; }

@@ -29,6 +29,9 @@ namespace HEF.XTask.RocketMQ
 
             var scheduleContext = rocketMessage.Context.ScheduleContext;
 
+            scheduleContext.TimingOnce(); //累加定时次数
+            scheduleContext.RetryOnce(); //累加重试次数
+
             if (scheduleContext.CheckStartTiming())  //定时调度 直接发布下一次执行任务
             {
                 var nextIntervalTask = new XRocketTask<TMessageBody>(rocketMessage);
@@ -36,8 +39,6 @@ namespace HEF.XTask.RocketMQ
 
                 return true;
             }
-
-            scheduleContext.RetryOnce(); //累加重试次数
 
             if (!result)  //延迟任务执行失败，进行重试
             {
