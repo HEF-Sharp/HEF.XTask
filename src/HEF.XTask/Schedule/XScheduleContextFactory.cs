@@ -56,6 +56,33 @@ namespace HEF.XTask
             return scheduleOptions.BuildScheduleContext();
         }
 
+        public static XScheduleContext TimingRetry(TimeSpan interval, TimeSpan timeout)
+        {
+            var intervalSeconds = Convert.ToInt32(Math.Floor(interval.TotalSeconds));
+            if (intervalSeconds < 1)
+                throw new ArgumentOutOfRangeException(nameof(interval), "timing retry interval seconds should greater than zero");
+
+            var timeoutSeconds = Convert.ToInt32(Math.Floor(timeout.TotalSeconds));
+            if (timeoutSeconds < 1)
+                throw new ArgumentOutOfRangeException(nameof(timeout), "timing retry timeout seconds should greater than zero");
+
+            if (timeoutSeconds < intervalSeconds)
+                throw new ArgumentOutOfRangeException(nameof(timeout), "timing retry timeout seconds should not less than interval seconds");
+
+            //定时重试也隶属于重试调度（不走定时调度），通过Timeout时间计算出最大重试次数
+            var maxRetryCount = Convert.ToInt32(Math.Floor(timeoutSeconds / (double)intervalSeconds));
+
+            var scheduleOptions = new XScheduleOptions
+            {
+                Type = XScheduleType.TimingRetry,
+                IntervalSeconds = intervalSeconds,
+                TimeoutSeconds = timeoutSeconds,
+                MaxRetryCount = maxRetryCount
+            };
+
+            return scheduleOptions.BuildScheduleContext();
+        }
+
         public static XScheduleContext DelayTiming(TimeSpan delay, TimeSpan interval, TimeSpan timeout = default)
         {
             var delaySeconds = Convert.ToInt32(Math.Floor(delay.TotalSeconds));

@@ -21,7 +21,11 @@
         /// <summary>
         /// 延迟定时执行
         /// </summary>
-        DelayTiming
+        DelayTiming,
+        /// <summary>
+        /// 定时重试
+        /// </summary>
+        TimingRetry
     }
 
     /// <summary>

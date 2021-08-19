@@ -46,6 +46,7 @@ namespace HEF.XTask.RocketMQ
                 RocketTaskContext { ScheduleContext: { ScheduleOptions: { Type: XScheduleType.Timing } } } => ScheduleTiming(rocketTask, rocketTaskContext),
                 RocketTaskContext { ScheduleContext: { ScheduleOptions: { Type: XScheduleType.Retry } } } => ScheduleRetry(rocketTask, rocketTaskContext),
                 RocketTaskContext { ScheduleContext: { ScheduleOptions: { Type: XScheduleType.DelayTiming } } } => ScheduleDelay(rocketTask, rocketTaskContext),
+                RocketTaskContext { ScheduleContext: { ScheduleOptions: { Type: XScheduleType.TimingRetry } } } => ScheduleRetry(rocketTask, rocketTaskContext),
                 _ => throw new NotSupportedException("not supported task schedule")
             };
         }
@@ -113,7 +114,13 @@ namespace HEF.XTask.RocketMQ
 
         private RocketDelayStatus GetRetryRocketDelay(RocketTaskContext rocketTaskContext)
         {
-            if (rocketTaskContext.ScheduleContext.RetryStatus.RetriedCount > 0)
+            var scheduleContext = rocketTaskContext.ScheduleContext;
+
+            //定时重试 根据间隔秒数返回Delay信息
+            if (scheduleContext.ScheduleOptions.Type == XScheduleType.TimingRetry)
+                return DelayProvider.CreateRocketDelay(scheduleContext.ScheduleOptions.IntervalSeconds);
+
+            if (scheduleContext.RetryStatus.RetriedCount > 0)
                 return DelayProvider.GetNextRocketDelay(rocketTaskContext.DelayStatus.DelayTimeLevel);
 
             return DelayProvider.GetMinRocketDelay();  //首次重试Delay
