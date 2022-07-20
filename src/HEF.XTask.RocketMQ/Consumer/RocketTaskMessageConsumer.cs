@@ -40,18 +40,30 @@ namespace HEF.XTask.RocketMQ
                 return true;
             }
 
-            if (!result)  //延迟任务执行失败，进行重试
+            if (result)  //延迟任务执行成功，无需其它操作
+                return true;
+
+            if (!scheduleContext.CheckStartRetry())  //没有重试 则直接通知任务执行失败
             {
-                if (scheduleContext.CheckStartRetry())
-                {
-                    var retryTask = new XRocketTask<TMessageBody>(rocketMessage);
-                    RocketTaskScheduler.Schedule(retryTask, rocketMessage.Context);
-                }
+                await OnConsumeFailed(typedMessage.Message, rocketMessage);
+                return true;
             }
+
+            if (scheduleContext.IsRetryEnd())  //重试结束后依然执行失败 才通知任务执行失败
+            {
+                await OnConsumeFailed(typedMessage.Message, rocketMessage);
+                return true;
+            }
+
+            //任务执行失败 进行重试
+            var retryTask = new XRocketTask<TMessageBody>(rocketMessage);
+            RocketTaskScheduler.Schedule(retryTask, rocketMessage.Context);
 
             return true;
         }
 
         protected abstract Task<bool> Consume(MessageExt messageExt, RocketMessage<TMessageBody> rocketMessage);
+
+        protected abstract Task OnConsumeFailed(MessageExt messageExt, RocketMessage<TMessageBody> rocketMessage);
     }
 }
