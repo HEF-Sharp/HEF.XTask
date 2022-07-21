@@ -43,21 +43,24 @@ namespace HEF.XTask.RocketMQ
             if (result)  //延迟任务执行成功，无需其它操作
                 return true;
 
-            if (!scheduleContext.CheckStartRetry())  //没有重试 则直接通知任务执行失败
+            if (!scheduleContext.IsRetrying())  //首次执行失败 通知任务执行失败
             {
                 await OnConsumeFailed(typedMessage.Message, rocketMessage);
-                return true;
             }
 
-            if (scheduleContext.IsRetryEnd())  //重试结束后依然执行失败 才通知任务执行失败
+            if (scheduleContext.CheckStartRetry())
             {
-                await OnConsumeFailed(typedMessage.Message, rocketMessage);
-                return true;
+                if (scheduleContext.IsRetryEnd())  //重试结束后依然执行失败 通知任务重试失败
+                {
+                    await OnRetryFailed(typedMessage.Message, rocketMessage);
+                }
+                else
+                {
+                    //任务执行失败 进行重试
+                    var retryTask = new XRocketTask<TMessageBody>(rocketMessage);
+                    RocketTaskScheduler.Schedule(retryTask, rocketMessage.Context);
+                }
             }
-
-            //任务执行失败 进行重试
-            var retryTask = new XRocketTask<TMessageBody>(rocketMessage);
-            RocketTaskScheduler.Schedule(retryTask, rocketMessage.Context);
 
             return true;
         }
@@ -65,5 +68,7 @@ namespace HEF.XTask.RocketMQ
         protected abstract Task<bool> Consume(MessageExt messageExt, RocketMessage<TMessageBody> rocketMessage);
 
         protected abstract Task OnConsumeFailed(MessageExt messageExt, RocketMessage<TMessageBody> rocketMessage);
+
+        protected abstract Task OnRetryFailed(MessageExt messageExt, RocketMessage<TMessageBody> rocketMessage);
     }
 }
