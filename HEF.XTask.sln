@@ -1,13 +1,27 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30709.132
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HEF.XTask", "src\HEF.XTask\HEF.XTask.csproj", "{6A449D06-6632-4C65-ABB1-B19587549FFE}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Queue", "Queue", "{28701F97-64FB-4843-B75E-3D5FF9458895}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HEF.XTask.RocketMQ", "src\HEF.XTask.RocketMQ\HEF.XTask.RocketMQ.csproj", "{A0E6DF7D-D89E-4268-BC14-8275DACD711D}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Hosting", "Hosting", "{365E909A-88FA-4477-AA77-6710E0A29648}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HEF.XTask.RocketMQ.DependencyInjection", "src\HEF.XTask.RocketMQ.DependencyInjection\HEF.XTask.RocketMQ.DependencyInjection.csproj", "{697BB671-DFAE-4821-8F40-D2E07B8FD666}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{110DDC5B-AE33-4A0F-82B0-5AD4F277D471}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RocketMQ", "RocketMQ", "{32857B56-31E8-436F-94F1-9D8B2BABB54C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HEF.XTask", "src\Common\HEF.XTask\HEF.XTask.csproj", "{95BC2263-CC5F-43DE-9D35-95F540F83FB8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HEF.XTask.Hosting", "src\Hosting\HEF.XTask.Hosting\HEF.XTask.Hosting.csproj", "{B077A35E-BBA6-42D4-B5DA-8E0A784E123D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HEF.XTask.Queue", "src\Queue\HEF.XTask.Queue\HEF.XTask.Queue.csproj", "{1C3391A7-5289-49F9-BF3F-EDD2B27F594C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HEF.XTask.RocketMQ", "src\RocketMQ\HEF.XTask.RocketMQ\HEF.XTask.RocketMQ.csproj", "{8F39B39F-ED17-44FD-A05B-9DE2D74BEA6E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HEF.XTask.RocketMQ.DependencyInjection", "src\RocketMQ\HEF.XTask.RocketMQ.DependencyInjection\HEF.XTask.RocketMQ.DependencyInjection.csproj", "{5BA69B1A-73B3-424F-A36D-A6E32B22B5D5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HEF.XTask.Queue.Redis", "src\Queue\HEF.XTask.Queue.Redis\HEF.XTask.Queue.Redis.csproj", "{4A268582-A388-40A9-8048-0E8E82A94851}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,21 +29,41 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6A449D06-6632-4C65-ABB1-B19587549FFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6A449D06-6632-4C65-ABB1-B19587549FFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6A449D06-6632-4C65-ABB1-B19587549FFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6A449D06-6632-4C65-ABB1-B19587549FFE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A0E6DF7D-D89E-4268-BC14-8275DACD711D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A0E6DF7D-D89E-4268-BC14-8275DACD711D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A0E6DF7D-D89E-4268-BC14-8275DACD711D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A0E6DF7D-D89E-4268-BC14-8275DACD711D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{697BB671-DFAE-4821-8F40-D2E07B8FD666}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{697BB671-DFAE-4821-8F40-D2E07B8FD666}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{697BB671-DFAE-4821-8F40-D2E07B8FD666}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{697BB671-DFAE-4821-8F40-D2E07B8FD666}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95BC2263-CC5F-43DE-9D35-95F540F83FB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95BC2263-CC5F-43DE-9D35-95F540F83FB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95BC2263-CC5F-43DE-9D35-95F540F83FB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95BC2263-CC5F-43DE-9D35-95F540F83FB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B077A35E-BBA6-42D4-B5DA-8E0A784E123D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B077A35E-BBA6-42D4-B5DA-8E0A784E123D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B077A35E-BBA6-42D4-B5DA-8E0A784E123D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B077A35E-BBA6-42D4-B5DA-8E0A784E123D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C3391A7-5289-49F9-BF3F-EDD2B27F594C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C3391A7-5289-49F9-BF3F-EDD2B27F594C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C3391A7-5289-49F9-BF3F-EDD2B27F594C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C3391A7-5289-49F9-BF3F-EDD2B27F594C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F39B39F-ED17-44FD-A05B-9DE2D74BEA6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F39B39F-ED17-44FD-A05B-9DE2D74BEA6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F39B39F-ED17-44FD-A05B-9DE2D74BEA6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F39B39F-ED17-44FD-A05B-9DE2D74BEA6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BA69B1A-73B3-424F-A36D-A6E32B22B5D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BA69B1A-73B3-424F-A36D-A6E32B22B5D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BA69B1A-73B3-424F-A36D-A6E32B22B5D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BA69B1A-73B3-424F-A36D-A6E32B22B5D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A268582-A388-40A9-8048-0E8E82A94851}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A268582-A388-40A9-8048-0E8E82A94851}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A268582-A388-40A9-8048-0E8E82A94851}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A268582-A388-40A9-8048-0E8E82A94851}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{95BC2263-CC5F-43DE-9D35-95F540F83FB8} = {110DDC5B-AE33-4A0F-82B0-5AD4F277D471}
+		{B077A35E-BBA6-42D4-B5DA-8E0A784E123D} = {365E909A-88FA-4477-AA77-6710E0A29648}
+		{1C3391A7-5289-49F9-BF3F-EDD2B27F594C} = {28701F97-64FB-4843-B75E-3D5FF9458895}
+		{8F39B39F-ED17-44FD-A05B-9DE2D74BEA6E} = {32857B56-31E8-436F-94F1-9D8B2BABB54C}
+		{5BA69B1A-73B3-424F-A36D-A6E32B22B5D5} = {32857B56-31E8-436F-94F1-9D8B2BABB54C}
+		{4A268582-A388-40A9-8048-0E8E82A94851} = {28701F97-64FB-4843-B75E-3D5FF9458895}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5E582A76-01B3-4406-B6ED-9B81B507971A}
