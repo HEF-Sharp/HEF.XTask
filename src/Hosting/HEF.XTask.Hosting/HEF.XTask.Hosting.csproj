@@ -6,6 +6,12 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Executor\HEF.XTask.Executor\HEF.XTask.Executor.csproj" />
+    <ProjectReference Include="..\..\Queue\HEF.XTask.Queue\HEF.XTask.Queue.csproj" />
   </ItemGroup>
 
 </Project>

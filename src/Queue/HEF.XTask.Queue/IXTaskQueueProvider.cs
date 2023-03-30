@@ -9,6 +9,6 @@ namespace HEF.XTask.Queue
 
         Task<XTask<TParam>> PopGetToRunTaskWithTimeoutAsync<TParam>(TimeSpan timeout, bool confirmCompleted);
 
-        Task ConfirmToRunTaskCompletedAsync<TParam>(XTask<TParam> toRunTask);
+        Task ConfirmTaskCompletedAsync<TParam>(XTask<TParam> xTask);
     }
 }

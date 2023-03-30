@@ -34,9 +34,9 @@ namespace HEF.XTask.Queue
             return PopGetToRunTaskWithTimeoutAsync(timeout, () => RedisHelper.RPopAsync<XTask<TParam>>(_queueConfig.ListKey));
         }
 
-        public Task ConfirmToRunTaskCompletedAsync<TParam>(XTask<TParam> toRunTask)
+        public Task ConfirmTaskCompletedAsync<TParam>(XTask<TParam> xTask)
         {
-            return RedisHelper.LRemAsync(_queueConfig.ConfirmListKey, -1, toRunTask);
+            return RedisHelper.LRemAsync(_queueConfig.ConfirmListKey, -1, xTask);
         }
 
         #region Helper Functions
