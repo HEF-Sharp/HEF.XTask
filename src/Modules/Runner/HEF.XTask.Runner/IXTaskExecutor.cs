@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace HEF.XTask.Executor
+namespace HEF.XTask.Runner
 {
     public interface IXTaskExecutor<TParam>
     {

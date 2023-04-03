@@ -10,8 +10,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Executor\HEF.XTask.Executor\HEF.XTask.Executor.csproj" />
     <ProjectReference Include="..\..\Queue\HEF.XTask.Queue\HEF.XTask.Queue.csproj" />
+    <ProjectReference Include="..\..\Runner\HEF.XTask.Runner\HEF.XTask.Runner.csproj" />
   </ItemGroup>
 
 </Project>

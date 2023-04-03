@@ -1,5 +1,5 @@
-﻿using HEF.XTask.Executor;
-using HEF.XTask.Queue;
+﻿using HEF.XTask.Queue;
+using HEF.XTask.Runner;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -35,9 +35,15 @@ namespace HEF.XTask.Hosting
 
         protected async Task ProcessingStartToRunTaskAsync(CancellationToken stoppingToken)
         {
+            using var scope = ScopeFactory.CreateScope();
+            var taskQueueProvider = scope.ServiceProvider.GetRequiredService<IXTaskQueueProvider>();
+
+            //检查是否存在Cancel退出的 队列任务
+            await CheckHandleRunTaskCancelledAsync(taskQueueProvider);
+
             while (!stoppingToken.IsCancellationRequested)
             {
-                var toRunTask = await GetToRunTaskWithTimeoutAsync();
+                var toRunTask = await GetToRunTaskWithTimeoutAsync(taskQueueProvider);
 
                 if (toRunTask != null)
                 {
@@ -47,8 +53,11 @@ namespace HEF.XTask.Hosting
                     //Task运行结束后 确认任务已完成
                     _ = runningTask.ContinueWith(async task =>
                     {
-                        await ConfirmToRunTaskCompletedAsync(toRunTask);
-                        
+                        await ConfirmToRunTaskCompletedAsync(taskQueueProvider, toRunTask);
+
+                        if (!task.IsCompletedSuccessfully)  //异常运行结束的Task
+                            await HandleRunTaskExceptionAsync(toRunTask);
+
                         _runningTasks.Remove(task);
                     });
                 }
@@ -58,32 +67,49 @@ namespace HEF.XTask.Hosting
             await Task.WhenAll(_runningTasks.ToArray());
         }
 
-        protected virtual Task<XTask<TParam>> GetToRunTaskWithTimeoutAsync()
+        protected virtual async Task CheckHandleRunTaskCancelledAsync(IXTaskQueueProvider taskQueueProvider)
         {
-            using var scope = ScopeFactory.CreateScope();
+            while (true)
+            {
+                var waitConfirmTask = await taskQueueProvider.PopGetWaitConfirmTaskAsync<TParam>();
 
-            var taskQueueProvider = scope.ServiceProvider.GetRequiredService<IXTaskQueueProvider>();
+                if (waitConfirmTask is null)
+                    break;
 
+                //Cancel结束的RunningTask
+                using var scope = ScopeFactory.CreateScope();
+                var cancelHandler = scope.ServiceProvider.GetRequiredService<IXTaskCancelHandler<TParam>>();
+
+                await cancelHandler.HandleCancelledTaskAsync(waitConfirmTask);
+            }
+        }
+
+        protected virtual Task<XTask<TParam>> GetToRunTaskWithTimeoutAsync(IXTaskQueueProvider taskQueueProvider)
+        {
             var popTimeout = TimeSpan.FromSeconds(_taskScheduleConfig.TaskQueueTimeoutSeconds);
+
             return taskQueueProvider.PopGetToRunTaskWithTimeoutAsync<TParam>(popTimeout, true);
+        }
+
+        protected virtual Task ConfirmToRunTaskCompletedAsync(IXTaskQueueProvider taskQueueProvider, XTask<TParam> toRunTask)
+        {
+            return taskQueueProvider.ConfirmTaskCompletedAsync(toRunTask);
         }
 
         protected virtual Task<bool> StartRunTaskAsync(XTask<TParam> toRunTask, CancellationToken stoppingToken)
         {
             using var scope = ScopeFactory.CreateScope();
-
             var taskExecutor = scope.ServiceProvider.GetRequiredService<IXTaskExecutor<TParam>>();
 
             return taskExecutor.ExecuteTaskAsync(toRunTask, stoppingToken);
         }
 
-        protected virtual Task ConfirmToRunTaskCompletedAsync(XTask<TParam> toRunTask)
+        protected virtual Task HandleRunTaskExceptionAsync(XTask<TParam> exceptionTask)
         {
             using var scope = ScopeFactory.CreateScope();
+            var exceptionHandler = scope.ServiceProvider.GetRequiredService<IXTaskExceptionHandler<TParam>>();
 
-            var taskQueueProvider = scope.ServiceProvider.GetRequiredService<IXTaskQueueProvider>();
-            
-            return taskQueueProvider.ConfirmTaskCompletedAsync(toRunTask);
+            return exceptionHandler.HandleExceptionTaskAsync(exceptionTask);
         }
     }
 }

@@ -39,6 +39,11 @@ namespace HEF.XTask.Queue
             return RedisHelper.LRemAsync(_queueConfig.ConfirmListKey, -1, xTask);
         }
 
+        public Task<XTask<TParam>> PopGetWaitConfirmTaskAsync<TParam>()
+        {
+            return RedisHelper.RPopAsync<XTask<TParam>>(_queueConfig.ConfirmListKey);
+        }
+
         #region Helper Functions
         protected static Task<XTask<TParam>> PopGetToRunTaskWithTimeoutAsync<TParam>(TimeSpan timeout, Func<Task<XTask<TParam>>> popGetFunction)
         {

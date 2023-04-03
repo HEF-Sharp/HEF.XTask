@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Common\HEF.XTask\HEF.XTask.csproj" />
+    <ProjectReference Include="..\..\..\Common\HEF.XTask\HEF.XTask.csproj" />
   </ItemGroup>
 
 </Project>
