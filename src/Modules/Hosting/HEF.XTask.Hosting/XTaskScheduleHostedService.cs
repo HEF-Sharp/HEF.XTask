@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -55,8 +56,8 @@ namespace HEF.XTask.Hosting
                     {
                         await ConfirmToRunTaskCompletedAsync(taskQueueProvider, toRunTask);
 
-                        if (!task.IsCompletedSuccessfully)  //异常运行结束的Task
-                            await HandleRunTaskExceptionAsync(toRunTask);
+                        if (task.IsFaulted)  //异常运行结束的Task
+                            await HandleRunTaskExceptionAsync(toRunTask, task.Exception);
 
                         _runningTasks.Remove(task);
                     });
@@ -104,12 +105,12 @@ namespace HEF.XTask.Hosting
             return taskExecutor.ExecuteTaskAsync(toRunTask, stoppingToken);
         }
 
-        protected virtual Task HandleRunTaskExceptionAsync(XTask<TParam> exceptionTask)
+        protected virtual Task HandleRunTaskExceptionAsync(XTask<TParam> exceptionTask, AggregateException aggregateException)
         {
             using var scope = ScopeFactory.CreateScope();
             var exceptionHandler = scope.ServiceProvider.GetRequiredService<IXTaskExceptionHandler<TParam>>();
 
-            return exceptionHandler.HandleExceptionTaskAsync(exceptionTask);
+            return exceptionHandler.HandleExceptionTaskAsync(exceptionTask, aggregateException.InnerExceptions.FirstOrDefault());
         }
     }
 }
